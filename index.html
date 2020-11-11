@@ -1,0 +1,57 @@
+<div id="app">
+		<p id="toggle-theme" onclick="toggleTheme();">☀</p>
+		<h1 id="header">Sanmi's Pomodoro Timer</h1>
+		<div id="adjustments">
+			<div id="break-length-wrapper">
+				<h3 id="break-label" class="adjust-labels">Break Length(Minutes)</h3>
+				<div id="break-length-items">
+					<div class="incre-decre">
+						<i class="fas fa-caret-up" id="break-increment" onclick="increaseBreakLength();"></i>
+						<!--<p id="break-increment" onclick="increaseBreakLength();">+</p>-->
+					    <i class="fas fa-caret-down" id="break-decrement" onclick="decreaseBreakLength();"></i>
+					    <!--<p id="break-decrement" onclick="decreaseBreakLength();" style="margin-top: -1rem;">-</p>-->
+					</div>
+					<p id="break-length" class="length">5</p>
+				</div>
+			</div>
+			<div id="session-length-wrapper">
+				<h3  id="session-label" class="adjust-labels">Sprint Length(Minutes)</h3>
+				<div id="session-length-items">
+					<div class="incre-decre">
+						<i class="fas fa-caret-up" id="session-increment" onclick="increaseSprintLength();"></i>
+						<!--<p id="session-increment" onclick="increaseSprintLength();">+</p>-->
+					    <i class="fas fa-caret-down" id="session-decrement" onclick="decreaseSprintLength();"></i>
+					    <!--<p id="session-decrement" onclick="decreaseSprintLength();" style="margin-top: -1rem">-</p>-->
+					</div>
+					<p id="session-length" class="length">25</p>
+				</div>
+			</div>
+		</div>
+		<div id="timer">
+			<h3 id="timer-label">Sprint</h3>
+			<div id="timer-container">
+				<div id="timer-wrapper">
+				<p id="time-left">25:00</p>
+			</div>
+			</div>
+			<div id="timer-controls">
+				<p  class="control-item" id="start_stop" onclick="startTimer();" style="font-size: 1rem">Start</p>
+				<p id="reset" class="control-item" onclick="resetTimer();" style="font-size: 1rem">Reset</p>
+			</div>
+		</div>
+		<audio src="https://res.cloudinary.com/dxjqr24gm/video/upload/v1599745924/Beep_Ping-SoundBible.com-217088958.mp3" id="beep"></audio>
+		<div id=""></div>
+	</div>
+
+<script src="https://cdn.freecodecamp.org/testable-projects-fcc/v1/bundle.js"></script>
+<script src="https://kit.fontawesome.com/c41013f84d.js" crossorigin="anonymous"></script>
+
+<!-- 
+
+Hello Camper!
+
+For now, the test suite only works in Chrome! Please read the README below in the JS Editor before beginning. Feel free to delete this message once you have read it. Good luck and Happy Coding! 
+
+- The freeCodeCamp Team 
+
+-->

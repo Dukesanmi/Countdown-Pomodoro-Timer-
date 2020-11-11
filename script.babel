@@ -1,0 +1,279 @@
+//Necessary Global variables
+		const log = console.log;
+		
+        let defaultTimeLeft = '25:00';
+     
+        document.getElementById('time-left').innerHTML = defaultTimeLeft;
+
+		/*Break Time Variables*/
+		var breakLen = Number(document.getElementById('break-length').innerHTML);
+
+		/*Session Time Variables*/
+		var sprintLen = Number(document.getElementById('session-length').innerHTML);
+		let timerInSession = false;
+		let refreshed;
+		let timerLabel = document.getElementById('timer-label').innerHTML;
+		let timeLeft;
+		timeLeft = sprintLen * 60;
+		let timerClock;
+		let paused;
+		let darkmode = initialTheme();		
+		//let refreshedTimer;
+
+		/*Initial App Theme*/
+		function initialTheme() {
+			const ReturningUser = 'App Theme darkmode?' in localStorage;
+			const savedMode = JSON.parse(localStorage.getItem('App Theme darkmode?'));
+            if (savedMode === true) {
+                document.body.style.cssText = 'background-color: #171617; color: #fff; transition: background-color 2s linear; transition: color 2s linear';
+				document.getElementById('toggle-theme').style.cssText = 'color: #7c5bba; transition: color 0.3s linear';
+				document.getElementById('timer-wrapper').style.cssText = 'border-color: #fff; transition: color 2s linear;'
+				document.getElementById('time-left').style.cssText = 'color: #fff; transition: color 2s linear;'
+            }
+            else {
+            	document.body.style.cssText = 'background-color: #fafafa; color: #111; transition: background-color 2s linear; transition: color 2s linear';
+				document.getElementById('toggle-theme').style.cssText = 'color: #deed05; transition: color 0.3s linear';
+				document.getElementById('timer-wrapper').style.cssText = 'border-color: #111; transition: color 2s linear;'
+				document.getElementById('time-left').style.cssText = 'color: #111; transition: color 2s linear;'
+            }
+
+			if (ReturningUser) {
+				return savedMode;
+			} 
+			else {
+				return false;
+			}
+		}
+
+		/*Toggle Darkmode*/
+		function toggleTheme() {
+			darkmode = !darkmode;
+			localStorage.setItem('App Theme darkmode?', JSON.stringify(darkmode));
+			log(`darkmode is ${darkmode}`);
+			if (darkmode) {
+				document.body.style.cssText = 'background-color: #171617; color: #fff; transition: background-color 2s linear; transition: color 2s linear';
+				document.getElementById('toggle-theme').style.cssText = 'color: #7c5bba; transition: color 0.3s linear';
+				document.getElementById('timer-wrapper').style.cssText = 'border-color: #fff; transition: color 2s linear;'
+				document.getElementById('time-left').style.cssText = 'color: #fff; transition: color 2s linear;'
+			}
+			else {
+				document.body.style.cssText = 'background-color: #fafafa; color: #111; transition: background-color 2s linear; transition: color 2s linear';
+				document.getElementById('toggle-theme').style.cssText = 'color: #deed05; transition: color 0.3s linear';
+				document.getElementById('timer-wrapper').style.cssText = 'border-color: #111; transition: color 2s linear;'
+				document.getElementById('time-left').style.cssText = 'color: #111; transition: color 2s linear;'
+			}
+		}
+		 
+        /*Stop and Reset Timer*/
+        function resetTimer() {
+	        toggleTimer(true);
+        }
+
+        function stopTimer() {
+        	timerInSession = false;
+        	refreshed = true;
+        	paused = false;
+        	sprintLen = 25;
+        	breakLen = 5;
+        	refreshedTimer = `${sprintLen}:00`;
+        	timeLeft = sprintLen * 60;
+        	document.getElementById('timer-label').innerHTML = 'Sprint';
+        	document.getElementById('session-length').innerHTML = `${sprintLen}`;
+        	document.getElementById('break-length').innerHTML = `${breakLen}`;
+        	document.getElementById('start_stop').innerHTML = 'Start';
+        	document.getElementById('beep').pause();
+        	document.getElementById('beep').currentTime = 0;
+        	clearInterval(timerClock);      	
+        	displayTimeLeft(); 
+        }
+
+        function startTimer() {
+        	timerInSession = !timerInSession;
+        	if (timerInSession === false) {
+        		//timerInSession = true;
+        	    log('timer is ' + timerInSession);
+        	    toggleTimer();
+        	    document.getElementById('start_stop').innerHTML = 'Start';
+        	}
+        	else {
+        		paused = true;
+        	    //timerInSession = false;
+        	    function needlessFun() {
+        		    if (document.getElementById('timer-label').innerHTML === 'Sprint') {
+        			    return 'Sprint';
+        		    }
+        		    else {
+        			    return 'Break';
+        		    }
+        	    }
+        	    toggleTimer();
+        	    log(`timer is paused that means timer is ${timerInSession} and there are ${timeLeft} seconds left to the end of this ${needlessFun()}`);
+        	    document.getElementById('start_stop').innerHTML = 'Pause';
+        	}
+        }
+
+        function toggleTimer(reset) {
+	        if (reset) {
+		        stopTimer();
+	            console.clear();
+	            log(`timer refreshed and refreshed is ${refreshed} and time left is now ${timeLeft}`);
+	            //log('time left is now ' + timeLeft);
+	        }
+	        else if (timerInSession === true) {
+	 	        timerClock = setInterval(()=> {
+	    	        timerChecker();
+	    	        displayTimeLeft();
+	            }, 1000);
+	        }
+	        else if (timerInSession === false && paused === true) {
+	            clearInterval(timerClock);
+	        }
+        }
+
+        function timerChecker() {
+        	if (timeLeft > 0) {
+	            timeLeft--;
+	        }
+	        
+	        else if (timeLeft === 0) {
+	        	
+	        	if (document.getElementById('timer-label').innerHTML === 'Sprint') {
+	        		document.getElementById('timer-label').innerHTML = 'Break';
+	        	    timeLeft = breakLen * 60;
+	        	    log('time Left is ' + timeLeft);
+	        	    timerLabel = 'Break';
+	        	    document.getElementById('beep').play();
+	        	} 
+	        	else {
+	        		resetTimer();
+	        	}
+
+            }
+	        displayTimeLeft();
+         }       
+
+
+        //Display timer countdown on page*/
+	    function displayTimeLeft() {
+	        const secondsLeft = timeLeft;
+	        let result = '';
+	        const seconds = secondsLeft % 60        	
+         	const minutes = parseInt(secondsLeft / 60) % 60;
+	        let hours = parseInt(secondsLeft / 3600);
+	        
+	        function appendStartZero(time) {
+		        return time < 10 ? `0${time}` : time
+	        }
+
+	        result += `${appendStartZero(minutes)}:${appendStartZero(seconds)}`;
+	        //log('timer result is ' + result + ' - result type of data is ' + typeof (result));
+	        document.getElementById('time-left').innerHTML = result;
+	        secondsLeft < 60 ? document.getElementById('time-left').style.color = 'red' : document.getElementById('time-left').style.color = 'initial';
+	        if (darkmode && secondsLeft >= 60) {
+	        	document.getElementById('time-left').style.color = '#fff';
+	        } 
+
+	    }	
+
+        /* Increase break length*/
+		function increaseBreakLength() {
+			if (breakLen >= 60) {
+				breakLen = 60;
+				document.getElementById('break-length').innerHTML = breakLen.toString();
+			}
+			else {
+			    if (timerInSession) {
+			    	document.getElementById('break-length').innerHTML = breakLen.toString();
+			    }
+			    else {
+			    	if (paused) {
+			    	    document.getElementById('break-length').innerHTML = breakLen.toString();
+			    	}
+			    	else {
+			    		breakLen = breakLen + 1;
+			    		document.getElementById('break-length').innerHTML = breakLen.toString();
+			    		if (timerLabel === 'Break') {
+			    			timeLeft = breakLen * 60;
+			    		}
+			    	}
+			    }
+			}
+		}
+        
+        /* Decrease break length */
+		function decreaseBreakLength() {
+			if (breakLen <= 1) {
+				breakLen = 1;
+				document.getElementById('break-length').innerHTML = breakLen.toString();
+			} else {
+
+			    if (timerInSession) {
+			    	document.getElementById('break-length').innerHTML = breakLen.toString();
+			    }
+			    else {
+			    	if (paused) {
+			    		document.getElementById('break-length').innerHTML = breakLen.toString();
+			    	}
+			    	else {
+			    		breakLen = breakLen - 1;
+			    		document.getElementById('break-length').innerHTML = breakLen.toString();
+			    		if (timerLabel === 'Break') {
+			    			timeLeft = breakLen * 60;
+			    		}
+			    	}
+			    }
+			}
+		}
+
+
+		/*Increase sprint length */
+		function increaseSprintLength() {
+			if (sprintLen >= 60) {
+				sprintLen = 60;
+				document.getElementById('session-length').innerHTML = sprintLen.toString();
+			} 
+			else {
+			    if (timerInSession) {
+			    	document.getElementById('session-length').innerHTML = sprintLen.toString();
+			    }
+			    else {
+			    	if (paused) {
+			    		document.getElementById('session-length').innerHTML = `${sprintLen}`;
+			    	}
+			    	else {
+			    		sprintLen = sprintLen + 1;
+			    		document.getElementById('session-length').innerHTML = `${sprintLen}`;
+			    		sprintLen < 10 ? document.getElementById('time-left').innerHTML = `0${sprintLen}:00` : document.getElementById('time-left').innerHTML = `${sprintLen}:00`;
+			    		timeLeft = sprintLen * 60;
+			    	}
+			    }
+			}			
+		}
+
+		log('Sprint length is ' + sprintLen + 'Minutes');
+
+		/*Decrease sprint length*/
+		function decreaseSprintLength() {
+			if (sprintLen <= 1) {
+				sprintLen = 1;
+				document.getElementById('session-length').innerHTML = sprintLen.toString();
+				return sprintLen;
+			}
+			else {
+				if (timerInSession) {
+			    	document.getElementById('session-length').innerHTML = sprintLen.toString();
+			    }
+			    else {
+			    	if (paused) {
+			    		document.getElementById('session-length').innerHTML = sprintLen.toString();
+			    	}
+			    	else {
+			    		sprintLen = sprintLen - 1;
+			    		document.getElementById('session-length').innerHTML = sprintLen.toString();
+			    		
+			    		sprintLen < 10 ? document.getElementById('time-left').innerHTML = `0${sprintLen}:00` : document.getElementById('time-left').innerHTML = `${sprintLen}:00`;
+			    		timeLeft = sprintLen * 60;
+			    	}
+			    }
+			}
+		}
